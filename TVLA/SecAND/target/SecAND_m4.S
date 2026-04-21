@@ -49,7 +49,7 @@ SecAND_m4:
     EOR     t1,  r, t1
 
     NOP                     
-    EOR     px,  px, px   
+    EOR     px,  px, px
     EOR     t1,  t2, t1
 
     EOR     px,  px, px
@@ -60,11 +60,11 @@ SecAND_m4:
     EOR     rz1, rz1, t1
 
     EOR     px,  px, px
-    NOP
+
     STR     rz0, [pz], #4
-    NOP
+
     STR     px,  [pool]
-    NOP
+
     STR     rz1, [pz], #4
 
     @ ---- Clean up register aliases ----
