@@ -1,3 +1,7 @@
+@ Hardened order-1 Cortex-M4 SecAND implementation of [GG25]
+@ François Gérard and Morgane Guerreau. High-Order and Cortex-M4 First-Order Implementations of Masked FrodoKEM
+@ https://github.com/fragerar/masked_Frodo
+
 .section .text
 .syntax unified
 .cpu cortex-m4

@@ -15,11 +15,8 @@ MaskedBernoulli_m4:
     SUB     sp, sp, #24         @ Stack
     MOV     r9, sp              @ R9 = buffers base
     
-    @ ----------------------------------------------------------
-    @ Initialization
-    @ ----------------------------------------------------------
     LDR     r10, [r2]           @ Load one[0]
-    LDR     r12, [r7]           @ DUMMY LOAD
+    LDR     r12, [r7]           @ Load Random
     LDR     r11, [r2, #4]       @ Load one[1]
     
     STR     r10, [r4]           @ Store x[0]
@@ -82,7 +79,7 @@ loop_start:
     MOV     r11, #0
     
     @ ----------------------------------------------------------
-    @ Step 3: secAND_m4
+    @ Step 3: SecAND_m4
     @ ----------------------------------------------------------
     ADD     r0, r9, #16         @ v ptr
     MOV     r1, r9              @ t ptr
@@ -93,56 +90,45 @@ loop_start:
     ADD     r7, r7, #4          @ pool++
 
     @ ----------------------------------------------------------
-    @ Step 4: Update x (FIXED)
+    @ Step 4: Update x
     @ ----------------------------------------------------------
 
-    LDR     r12, [r7]           @ Bus: v[1] -> Load Random
+    LDR     r12, [r7]           @ Load Random 
     
     @ --- SHARE 0 ---
-    LDR     r0, [r9, #16]       @ Load v[0] !!!!!!
+    LDR     r0, [r9, #16]       @ Load v[0]
 
     LDR     r12, [r7]           @ Scrub Read Bus
     LDR     r10, [r4]           @ Load x[0]
     EOR     r10, r10, r0        @ x[0] ^= v[0]
 
-    @ --------------------------------------------------------
-    @ FIX FOR x[0]: Sacrificial Store with Buffer Break
-    @ --------------------------------------------------------
     LDR     r12, [r7]           @ Load Random
-    STR     r12, [r4]           @ 1. Sacrifice to x[0] (Scrub x Bus)
-    
-    LDR     r12, [r7]           @ 2. Dummy Load from Pool 
-                                @ (Forces Write Buffer to split stores)
-
-    STR     r10, [r4]           @ 3. Real Store to x[0]
-
-    @ --------------------------------------------------------
+    STR     r12, [r4]           @ Scrub x[0]
     
     LDR     r12, [r7]           @ Load Random
-    STR     r12, [r7, #-4]      @ Dummy Store to Pool/Stack (Clears Bus from x[0])   
+
+    STR     r10, [r4]           @ Store x[0]
+
+    LDR     r12, [r7]           @ Load Random
+    STR     r12, [r7, #-4]      @ Dummy Store   
     
     EOR     r10, r10, r10       @ Clear x[0] reg
     MOV     r0, #0              @ Clear v[0] reg
 
     @ --- SHARE 1 ---
     LDR     r1, [r9, #20]       @ Load v[1]
-    LDR     r12, [r7]           @ Scrub Read Bus
+    LDR     r12, [r7]           @ Load Random
  
 
     LDR     r0, [r4, #4]        @ Load x[1]
-    EOR     r10, r10, r10
+    EOR     r10, r10, r10       @ Dummy xor
 
-    EOR     r0, r0, r1          @ New x[1] calculated in R0
+    EOR     r0, r0, r1          @ x[1]
 
-    @ --------------------------------------------------------
-    @ FIX FOR x[1]: Keep the Read After Write Hazard
-    @ --------------------------------------------------------
     LDR     r12, [r7]           @ Load Random
+    STR     r12, [r9, #20]      @ Dummy Store
     
-    STR     r12, [r9, #20]
-    
-    STR     r0, [r4, #4]        @ 3. Write Real x[1]
-    @ --------------------------------------------------------
+    STR     r0, [r4, #4]        @ Store x[1]
 
     @ Cleanup
     MOV     r0, #0
