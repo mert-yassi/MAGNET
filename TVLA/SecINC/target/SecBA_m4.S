@@ -8,7 +8,6 @@ SecBA_m4:
 
     PUSH {r4-r11,r14}
 
-    @ Register aliases
     px          .req r1
     py          .req r0
     pool        .req r2
@@ -23,7 +22,6 @@ SecBA_m4:
     t3          .req r11
     t4          .req r12
 
-    @ 1. Process Share 1 (rx1) and Gamma
     LDR G, [pool]           @ Load 32-bit Random (Gamma)
     LDR rx1, [px, #4]       @ Load 32-bit input share x1
 
@@ -32,7 +30,6 @@ SecBA_m4:
     
     EOR rx1, t4, t4         @ Scrub rx1 register
 
-    @ 2. Process Share 0 (rx0)
     LDR t1, [pool]          @ Reload Gamma
     LDR rx0, [px]           @ Load 32-bit input share x0
 
@@ -42,17 +39,14 @@ SecBA_m4:
 
     EOR T, T, rx0           @ T = ((x0 ^ Gamma) - Gamma) ^ x0
     
-    @ 3. Cross Combination
     EOR ry0, rx0, G         @ ry0 = x0 ^ (Gamma ^ x1) = x ^ Gamma
     EOR rx0, t4, t4         @ Scrub rx0 register
     
     SUB ry0, ry0, G         @ ry0 = (x ^ Gamma) - (Gamma ^ x1)
     
-    @ 4. Final Combination
     EOR t3, T, ry0          @ Final Merge
     STR t3, [py]            @ Store output share y0
 
-    @ Cleanup aliases
     .unreq py            
     .unreq px            
     .unreq pool     

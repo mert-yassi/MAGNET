@@ -45,7 +45,6 @@ SecAB_m4:
     AND     t2, T, rx0
     EOR     G, G, ry0
 
-    
     NOP
     EOR     t1, t1, t1  
     
@@ -63,12 +62,13 @@ SecAB_m4:
 
     NOP
     EOR     t2, t2, t2
+    EOR     t3, t3, t3
+    NOP
+    NOP
 
     .rept 31
-        NOP
         EOR     t2, t2, t2    
         
-        NOP
         EOR     t3, t3, t3
     
         AND     G, T, rx1
@@ -77,7 +77,6 @@ SecAB_m4:
         AND     T, T, rx0
         EOR     G, G, T
         
-        NOP
         EOR     t1, t1, t1        
         
         LSL     T, G, #1
