@@ -8,17 +8,6 @@
 #include <string.h>
 
 #define NUM_SHARES 2
-#define MASK_ORDER NUM_SHARES - 1
-#define w 32
-#define W 5 // ceil(log2(w-1))
-
-#define PARAMS_LOGQ 16
-#define PARAMS_Q (1 << PARAMS_LOGQ)
-
-#define N 10
-#define SIG 10
-#define LMD 16
-#define PS 0.76
 
 /* ---------------------------------------------------------------------- */
 
