@@ -7,40 +7,7 @@
 #include <math.h>
 #include <string.h>
 
-#define w 32
-#define W 5 // ceil(log2(w-1))
 #define NUM_SHARES 2
-#define rand_uint32() xoshiro_next()
-
-static inline uint32_t rotl(const uint32_t x, int k) {
-	return (x << k) | (x >> (32 - k));
-}
-
-static uint32_t s[4];
-
-void seed_xoshiro(uint32_t* up){
-    s[0] = up[0];
-    s[1] = up[1];
-    s[2] = up[0];
-    s[3] = up[1];
-}
-
-uint32_t xoshiro_next(void) {
-	const uint32_t result_starstar = rotl(s[0] * 5, 7) * 9;
-
-	const uint32_t t = s[1] << 9;
-
-	s[2] ^= s[0];
-	s[3] ^= s[1];
-	s[1] ^= s[2];
-	s[0] ^= s[3];
-
-	s[2] ^= t;
-
-	s[3] = rotl(s[3], 11);
-
-	return result_starstar;
-}
 
 extern void SecSQU_m4(uint32_t *zp, const uint32_t *xp, const uint32_t *pool);
 

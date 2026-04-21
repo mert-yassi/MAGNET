@@ -5,122 +5,67 @@
 
 .global SecSQU_m4
 
-@ -----------------------------------------------------------------------------
-@ void SecSQU_m4(uint32_t* C, const uint32_t* A, const uint32_t* pool)
-@ -----------------------------------------------------------------------------
 SecSQU_m4:
-    PUSH    {r4-r10, lr}
+    PUSH    {r4-r11, lr}
 
-    LDR     r7, [r2]            @ Load r (pool[0])
-    LDR     r9, [r2, #4]        @ Load rho (pool[1])
-    LDR     r10, [r2, #8]       @ t
+    LDR     r7, [r2]            @ r (pool[0])
+    LDR     r9, [r2, #4]        @ rho (pool[1])
+    LDR     r10, [r2, #8]       @ t (pool[2])
     
     LDR     r3, [r1]            @ Load A[0]
     SUB     r3, r3, r9          @ A[0]' = A[0] - rho
 
-    LDR     r12, [r2]           @ Dummy Load
-    EOR     r12, r12, r12       @ Clear reg
+    LDR     r12, [r2]           @ Random load
+    EOR     r12, r12, r12       @ Dummy xor
     
     LDR     r4, [r1, #4]        @ Load A[1]
     ADD     r4, r4, r9          @ A[1]' = A[1] + rho
 
-    NOP
-    EOR     r12, r12, r12       @ Clear history
-    NOP
-    MUL     r12, r7, r7         @ Scratch = r * r
-    NOP
+    LDR     r9, [r2, #12]       @ Random load
 
-    MUL     r5, r3, r3          @ r5 = (A[0]')^2
+    AND     r12, r9, r9         @ ALU scrub
+    MUL     r12, r9, r9         @ ALU scrub   
+
+    MUL     r5, r3, r3          @ (A[0]')^2
     
-    NOP
-    EOR     r12, r12, r12       @ Clear history
-    NOP
-    MUL     r12, r7, r7         @ Scratch = r * r
-    NOP
-
-    MUL     r6, r4, r4          @ r6 = (A[1]')^2
-
-    NOP
-    EOR     r12, r12, r12       @ Clear history
-    NOP
-    MUL     r12, r7, r7         @ Scratch = r * r
-    NOP
+    MUL     r12, r9, r9         @ ALU scrub
     
-    ADD     r11, r3, r10            @ u  = r3 + t
+    MUL     r6, r4, r4          @ (A[1]')^2
 
-    NOP
-    EOR     r12, r12, r12       @ Clear history
-    NOP
-    MUL     r12, r7, r7         @ Dummy MUL to pre-charge ALU
-    NOP
-
-    MUL     r8,  r11, r4        @ m1 = u * r4         
-
-    NOP
-    NOP
-    EOR     r12, r12, r12       @ Clear history
-    NOP
-    MUL     r12, r7, r7         @ Dummy MUL to pre-charge ALU
-    NOP
-    NOP
+    AND     r12, r9, r9         @ ALU scrub
     
-    MUL     r12, r10, r4        @ m2 = t * r4
+    ADD     r11, r3, r10        @ u = A[0]' + t
 
-    NOP
-    NOP
-    EOR     r9, r9, r9          @ Clear history
-    NOP
-    MUL     r9, r7, r7          @ Dummy MUL to pre-charge ALU
-    NOP
-    NOP
-
-    SUB     r8,  r8,  r12       @ r8 = r3 * r4
-
-    NOP
-    EOR     r12, r12, r12       @ Clear history
-    NOP
-    MUL     r12, r7, r7         @ Scratch = r * r
-    NOP
-
-    LSL     r8, r8, #1          @ r8 = 2 * A[0]' * A[1]'
-
-    NOP
-    EOR     r12, r12, r12       @ Clear history
-    NOP
-    MUL     r12, r7, r7         @ Scratch = r * r
-    NOP
-
-    ADD     r8, r7, r8          @ r8 = r + 2*A[0]'*A[1]'
-
-    NOP
-    EOR     r12, r12, r12       @ Clear history
-    NOP
-    MUL     r12, r7, r7         @ Scratch = r * r
-    NOP
-
-    SUB     r5, r5, r7          @ C[0] = (A[0]')^2 - r
+    MUL     r8, r9, r9          @ ALU scrub
+    MUL     r8, r11, r4         @ m1 = u * A[1]'
     
-    NOP
-    EOR     r12, r12, r12       @ Clear history
-    NOP
-    MUL     r12, r7, r7         @ Scratch = r * r
-    NOP
+    MUL     r12, r9, r9         @ ALU scrub
+    MUL     r12, r10, r4        @ m2 = t * A[1]'
 
-    ADD     r6, r6, r8          @ C[1] = (A[1]')^2 + 2*A[0]'*A[1]' + r
+    AND     r11, r9, r9         @ ALU scrub
 
-    NOP
-    EOR     r9, r9, r9          @ Clear history
+    ADD     r11, r7, r8         @ r11 = r + m1
+    AND     r3, r9, r9          @ ALU scrub
 
-    LDR     r12, [r2]           @ Load Random
+    ADD     r11, r11, r8        @ r11 = r + 2*m1
+    AND     r3, r9, r9          @ ALU scrub
+
+    SUB     r11, r11, r12       @ r11 = r + 2*m1 - m2
+    AND     r3, r9, r9          @ ALU scrub
+
+    SUB     r8, r11, r12        @ r8 = r + 2*m1 - 2*m2
+    AND     r11, r9, r9         @ ALU scrub
+
+    SUB     r5, r5, r7          @ C[0]
+    
+    AND     r11, r9, r9         @ ALU scrub
+    
+    ADD     r6, r6, r8          @ C[1]
 
     STR     r5, [r0]            @ Store C[0]
-    NOP
 
-    LDR     r12, [r2]           @ Load Random
-    
-    NOP
+    STR     r9, [r0, #4]        @ Dummy store
+
     STR     r6, [r0, #4]        @ Store C[1]
-
-    LDR     r12, [r2]           @ Load Random
-
-    POP     {r4-r10, pc}
+    
+    POP     {r4-r11, pc}
