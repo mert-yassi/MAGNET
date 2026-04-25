@@ -3,7 +3,7 @@ TARGET = SecINC
 # List C source files here.
 # Header files (.h) are automatically pulled in.
 SRC += project.c
-ASRC+= SecBA_m4.S SecAB_m4.S SecINC_m4.S
+ASRC+= SecB2A_m4.S SecA2B_m4.S SecINC_m4.S
 
 OPT = 0
 
