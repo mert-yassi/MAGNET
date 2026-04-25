@@ -33,7 +33,7 @@ The integration of **MAGNET** and **GR19-DGS** into the MatRiCT+ payment protoco
 
 ``make && ./ringct``
 
-By default, **MAGNET** is used as the discrete Gaussian sampler. The active sampler can be changed by modifying the corresponding #define directive in the `n10/param.h` file.
+By default, **MAGNET** is used as the discrete Gaussian sampler. The active sampler can be changed by modifying the corresponding #define directive in the `n10/param.h` file. Run ``make clean && make && ./ringct`` after changing any directives.
 
 ## ARM Cortex-M4 Implementation
 
