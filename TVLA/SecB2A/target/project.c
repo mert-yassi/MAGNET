@@ -7,6 +7,10 @@
 #include <math.h>
 #include <string.h>
 
+#define NUM_SHARES 2
+
+void SecB2A_m4(uint32_t *zp, uint32_t *xp, uint32_t *up);
+
 uint8_t get_pt(uint8_t* pt, uint8_t len) {
 
     volatile uint32_t zp[NUM_SHARES], xp[NUM_SHARES], yp[NUM_SHARES], up[1];
