@@ -7,10 +7,6 @@ void Refresh(uint32_t* x);
 void FullRefresh(uint32_t* z, const uint32_t* x);
 uint32_t FullXOR(uint32_t* x);
 
-uint32_t SecAND_Order1(uint32_t x, uint32_t y, uint32_t s, uint32_t t, uint32_t u);
-void SecADD_Order1(uint32_t* z, const uint32_t* x, const uint32_t* y);
-void SecINC_Order1(uint32_t *z, const uint32_t *x, const uint32_t *one);
-
 void SecNEG(uint32_t* z, const uint32_t* x);
 void SecAND(uint32_t* z, const uint32_t* x, const uint32_t* y);
 void SecOR(uint32_t* z, const uint32_t* x, const uint32_t* y);

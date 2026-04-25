@@ -80,47 +80,48 @@ void SecOR(uint32_t* z, const uint32_t* x, const uint32_t* y) { // [CC24]
 }
 
 void SecINC(uint32_t *z, const uint32_t *x, const uint32_t *one) {
-	    uint32_t g[NUM_SHARES] = {0}, a[NUM_SHARES] = {0}, a_prm[NUM_SHARES] = {0};
-        for(int i = 0; i < NUM_SHARES; ++i) g[i] = x[i];
+    uint32_t g[NUM_SHARES] = {0}, a[NUM_SHARES] = {0}, a_prm[NUM_SHARES] = {0};
+    for(int i = 0; i < NUM_SHARES; ++i) g[i] = x[i];
 
-        for(int j = 1; j <= W; ++j) {
-        	uint32_t pw = 1 << (j - 1);
-            const uint32_t high = 0xFFFFFFFF << pw;
-            const uint32_t low  = ~high;
-            
-            for(int i = 0; i < NUM_SHARES; ++i) a[i] = g[i] << pw;
-            SecAND(a_prm, a, g);
-            
-            for(int i = 0; i < NUM_SHARES; ++i) g[i] = (a_prm[i] & high) ^ (g[i] & low);
-            Refresh(g);
-        }
-        for(int i = 0; i < NUM_SHARES; ++i) z[i] = x[i] ^ one[i] ^ (g[i] << 1);
+    for(int j = 1; j <= W; ++j) {
+    	uint32_t pw = 1 << (j - 1);
+        const uint32_t high = 0xFFFFFFFF << pw;
+        const uint32_t low  = ~high;
+        
+        for(int i = 0; i < NUM_SHARES; ++i) a[i] = g[i] << pw;
+        SecAND(a_prm, a, g);
+        
+        for(int i = 0; i < NUM_SHARES; ++i) g[i] = (a_prm[i] & high) ^ (g[i] & low);
+        Refresh(g);
+    }
+    for(int i = 0; i < NUM_SHARES; ++i) z[i] = x[i] ^ one[i] ^ (g[i] << 1);
+    Refresh(z);
 }
 
 void SecADD(uint32_t* z, const uint32_t* x, const uint32_t* y) { // [BBE+18]
-		uint32_t p[NUM_SHARES] = {0}, p_[NUM_SHARES] = {0}, g[NUM_SHARES] = {0}, a[NUM_SHARES] = {0}, a_[NUM_SHARES] = {0}, ap[NUM_SHARES] = {0};
-		for(int i = 0; i < NUM_SHARES; ++i) p[i] = x[i] ^ y[i];
-		SecAND(g, x, y);
-		
-		for(int j = 1; j <= W - 1; ++j) {
-			uint32_t pw = 1 << (j - 1);
-			for(int i = 0; i < NUM_SHARES; ++i) a[i] = g[i] << pw;
-			SecAND(a_, a, p);
-			
-			for(int i = 0; i < NUM_SHARES; ++i) g[i] ^= a_[i];
-
-			for(int i = 0; i < NUM_SHARES; ++i) ap[i] = p[i] << pw;
-			Refresh(ap);
-			SecAND(p_, p, ap);
-			
-			for(int i = 0; i < NUM_SHARES; ++i) p[i] = p_[i];
-		}
-		for(int i = 0; i < NUM_SHARES; ++i) a[i] = g[i] << (1 << (W - 1));
+	uint32_t p[NUM_SHARES] = {0}, p_[NUM_SHARES] = {0}, g[NUM_SHARES] = {0}, a[NUM_SHARES] = {0}, a_[NUM_SHARES] = {0}, ap[NUM_SHARES] = {0};
+	for(int i = 0; i < NUM_SHARES; ++i) p[i] = x[i] ^ y[i];
+	SecAND(g, x, y);
+	
+	for(int j = 1; j <= W - 1; ++j) {
+		uint32_t pw = 1 << (j - 1);
+		for(int i = 0; i < NUM_SHARES; ++i) a[i] = g[i] << pw;
 		SecAND(a_, a, p);
 		
 		for(int i = 0; i < NUM_SHARES; ++i) g[i] ^= a_[i];
 
-		for(int i = 0; i < NUM_SHARES; ++i) z[i] = x[i] ^ y[i] ^ (g[i] << 1);
+		for(int i = 0; i < NUM_SHARES; ++i) ap[i] = p[i] << pw;
+		Refresh(ap);
+		SecAND(p_, p, ap);
+		
+		for(int i = 0; i < NUM_SHARES; ++i) p[i] = p_[i];
+	}
+	for(int i = 0; i < NUM_SHARES; ++i) a[i] = g[i] << (1 << (W - 1));
+	SecAND(a_, a, p);
+	
+	for(int i = 0; i < NUM_SHARES; ++i) g[i] ^= a_[i];
+
+	for(int i = 0; i < NUM_SHARES; ++i) z[i] = x[i] ^ y[i] ^ (g[i] << 1);
 }
 
 void SecSQU(uint32_t* C, const uint32_t* A) {

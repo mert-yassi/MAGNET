@@ -30,14 +30,13 @@ void MaskedBernoulli(uint32_t *x, uint32_t *p, uint32_t *one) {
 
 void MaskedGeometric(uint32_t *x, uint32_t *p_geo, uint32_t *one) {
 	for(int j = 0; j <= kap - 1; ++j) {
-		uint32_t b[NUM_SHARES] = {0}, t[NUM_SHARES] = {0}, tmp[NUM_SHARES] = {0};
+		uint32_t b[NUM_SHARES] = {0}, t[NUM_SHARES] = {0};
 		
 		MaskedBernoulli(b, &p_geo[j * (mu * NUM_SHARES)], one);
 
 		for(int i = 0; i < NUM_SHARES; ++i) t[i] = b[i] << j;
 		
-		SecOR(tmp, x, t);
-		for(int i = 0; i < NUM_SHARES; ++i) x[i] = tmp[i];
+		for(int i = 0; i < NUM_SHARES; ++i) x[i] ^= t[i];
 		
 		Refresh(x);
 	}
@@ -113,20 +112,6 @@ void MAGNET(uint32_t *samps, uint32_t *mSIG, uint32_t *one, uint32_t *p_geo,  ui
 
 		k += FullXOR(b);
 	}
-
-#ifdef VERIFY
-	FILE *outfile = fopen("samples.txt", "w");
-
-	for (int i = 0; i < N; i++) {
-		fprintf(outfile, "%d ", (int32_t)FullXOR(&samps[i * NUM_SHARES]));
-	}
-	fprintf(outfile, "%d ", (int32_t)(SIG * SIG));
-	fprintf(outfile, "%d ", N);
-
-	fclose(outfile);
-
-	exit(system("python3 discretegauss.py")); // plotting samples using the code from "The Discrete Gaussian for Differential Privacy [CKS20]"
-#endif
 }
 
 

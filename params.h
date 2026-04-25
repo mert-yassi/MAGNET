@@ -1,20 +1,25 @@
 #ifndef PARAMS_H_
 #define PARAMS_H_
 
-#define N 10000
-#define LMD 64
-#define PS 0.76
+#define TIME
+//#define VERIFY
 
-#define ITER 25
+#define ITER 100
 
-#define NUM_SHARES 2
-#define MASK_ORDER NUM_SHARES - 1
-#define w 32
+#ifdef TIME
+    #define N 10000 // N to match Figure 7 times
+#else
+    #define N 100000 // Larger N to plot a nicer distribution
+#endif
+#define LMD 64 // Security parameter lambda
+#define PS 0.76 // Acceptance probability
+
+#define NUM_SHARES 2 // Number of shares
+#define MASK_ORDER NUM_SHARES - 1 // Masking order
+#define w 32 // Word size
 #define W 5 // ceil(log2(w-1))
 
 #define rand_uint32() xoshiro_next()
-
-//#define VERIFY
 
 extern int kap, l, mu, m, SIG;
 extern double r, p, dlap_bias;
