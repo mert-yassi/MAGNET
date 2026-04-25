@@ -17,9 +17,6 @@
 
 #define rand_uint32() xoshiro_next()
 
-//#define VERIFY
-//#define VERIFY2
-
 extern int kap, l, mu, m, SIG;
 extern double r, p, dlap_bias;
 extern uint32_t *p_lap, *p_geo, *p_exp;

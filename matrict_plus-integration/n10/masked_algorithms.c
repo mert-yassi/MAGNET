@@ -37,7 +37,7 @@ void MaskedGeometric(uint32_t *x, uint32_t *p_geo, uint32_t *one) {
 
 		for(int i = 0; i < NUM_SHARES; ++i) t[i] = b[i] << j;
 		
-		for(int i = 0; i < NUM_SHARES; ++i) x[i] = x[i] ^ t[i];
+		for(int i = 0; i < NUM_SHARES; ++i) x[i] ^= t[i];
 		
 		Refresh(x);
 	}
@@ -117,23 +117,7 @@ void MAGNET(int64_t *out) {
 	
 	for (int i = 0; i < NN; i++) {
 	    out[i] = (int64_t)(int32_t)FullXOR(&samps[i * NUM_SHARES]);
-	    //printf("%d\n", FullXOR(&samps[i * NUM_SHARES]));
 	}
-
-#ifdef VERIFY
-	FILE *outfile = fopen("samples.txt", "w");
-
-	for (int i = 0; i < NN; i++) {
-		fprintf(outfile, "%d ", (int32_t)FullXOR(&samps[i * NUM_SHARES]));
-	}
-	fprintf(outfile, "%d ", (int32_t)(SIG * SIG));
-	fprintf(outfile, "%d ", NN);
-
-	fclose(outfile);
-
-	//exit(system("python3 discretegauss.py")); // plotting samples using the code from "The Discrete Gaussian for Differential Privacy [CKS20]"
-#endif
-	
     free(samps);
 }
 
