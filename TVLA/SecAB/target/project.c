@@ -9,7 +9,7 @@
 
 #define NUM_SHARES 2
 
-extern void SecAB_m4(uint32_t *zp, const uint32_t *xp, const uint32_t *up);
+extern void SecA2B_m4(uint32_t *zp, const uint32_t *xp, const uint32_t *up);
 
 uint8_t get_pt(uint8_t* pt, uint8_t len) {
     volatile uint32_t zp[NUM_SHARES], xp[NUM_SHARES], yp[NUM_SHARES], up[1];
@@ -24,7 +24,7 @@ uint8_t get_pt(uint8_t* pt, uint8_t len) {
 
     trigger_high();
 
-    SecAB_m4(zp, xp, up);
+    SecA2B_m4(zp, xp, up);
 
     trigger_low();
 
