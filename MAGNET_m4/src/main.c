@@ -11,10 +11,10 @@ int kap, l, mu, m;
 double r, p, dlap_bias;
 uint32_t s[4]; 
 
-#define N_ 100
+#define N_ 1000
 #define LMD 64
 #define PS 0.76
-#define SIG 256
+#define SIG 32
 #define NUM_SHARES 2 
 
 #define rand_uint32() xoshiro_next_c()
@@ -177,6 +177,9 @@ int main(void) {
     printf("--- Benchmark Results ---\n");
     printf("Total Cycles: %u\n", total_cycles);
     printf("Cycles per Sample (m=%d): %u\n", m, total_cycles / m);
+
+    printf("Samples:\n");
+    for (int i = 0; i < N_; i++) printf("%d ", (int32_t)FullXOR(&samps[i * NUM_SHARES]));
     
     free(samps); 
     free(p_exp); 

@@ -4,8 +4,8 @@
 .thumb
 
 .global SecADD_m4
-.extern SecBA_m4
-.extern SecAB_m4
+.extern SecB2A_m4
+.extern SecA2B_m4
 
 SecADD_m4:
     PUSH {r4-r8, lr}
@@ -17,11 +17,11 @@ SecADD_m4:
 
     MOV r0, sp
     MOV r1, r5
-    BL SecBA_m4
+    BL SecB2A_m4
 
     ADD r0, sp, #8
     MOV r1, r6
-    BL SecBA_m4
+    BL SecB2A_m4
 
     LDR r0, [sp]
     LDR r1, [sp, #8]
@@ -35,7 +35,7 @@ SecADD_m4:
 
     MOV r0, r4
     MOV r1, sp
-    BL SecAB_m4
+    BL SecA2B_m4
 
     ADD sp, sp, #16
     POP {r4-r8, pc}

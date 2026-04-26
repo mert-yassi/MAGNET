@@ -6,7 +6,6 @@
 .global MaskedGeometric_m4
 .extern MaskedBernoulli_m4
 .extern Refresh_m4
-.extern SecOR_m4
 .extern kap
 .extern mu
 
@@ -17,6 +16,10 @@ MaskedGeometric_m4:
     MOV     r6, r2
     
     SUB     sp, sp, #32
+
+    MOV     r3, #0
+    STR     r3, [r4]
+    STR     r3, [r4, #4]
 
     LDR     r0, =kap
     LDR     r10, [r0]
@@ -37,20 +40,15 @@ loop_geo:
     ADD     r5, r5, r1
 
     LDR     r0, [sp]
-    LSL     r0, r0, r8
-    STR     r0, [sp, #8]
     LDR     r1, [sp, #4]
+    LSL     r0, r0, r8
     LSL     r1, r1, r8
-    STR     r1, [sp, #12]
 
-    ADD     r0, sp, #16
-    MOV     r1, r4
-    ADD     r2, sp, #8
-    BL      SecOR_m4
-
-    LDR     r0, [sp, #16]
+    LDR     r2, [r4]
+    LDR     r3, [r4, #4]
+    EOR     r0, r2, r0
+    EOR     r1, r3, r1
     STR     r0, [r4]
-    LDR     r1, [sp, #20]
     STR     r1, [r4, #4]
 
     MOV     r0, r4
