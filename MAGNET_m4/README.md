@@ -62,7 +62,7 @@ This step downloads Zephyr and all required NCS components.
 
 ## 2. Building MAGNET_m4
 
-From the Zephyr directory within the NCS workspace, build the application for the nRF52840 development kit:
+Copy **MAGNET_m4** folder inside the Zephyr directory of your nRF Connect SDK (NCS) workspace. Once moved, the path to the project should look like this: ``ncs/v3.1.1/zephyr/MAGNET_m4``. Then, navigate to the Zephyr directory and build the application for the nRF52840 development kit:
 
 ```
 cd ncs/v3.1.1/zephyr
