@@ -1,6 +1,6 @@
 # MAGNET: MAsked Gaussian Now Efficient and Table-less 
 
-This repository provides reference implementations of **MAGNET**, a table-less and efficient masked discrete Gaussian sampler, along with comparative implementations. It includes C and ARM Cortex-M4 implementations, integrations of the masked samplers into [MatRiCT+](https://gitlab.com/raykzhao/matrict_plus) private payment protocol, and leakage assessment artifacts for first-order side-channel evaluation.
+This repository provides C and ARM Cortex-M4 reference code for [MAGNET](https://eprint.iacr.org/2026/728), an efficient, table-less masked discrete Gaussian sampler. It also features comparative implementations, integration into the [MatRiCT+](https://gitlab.com/raykzhao/matrict_plus) private payment protocol, and leakage assessment tests for first-order side-channel evaluation.
 
 #### Prerequisites
   - A Linux-based OS
