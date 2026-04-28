@@ -29,7 +29,7 @@ To see the runtimes of **GR19-DGS**, under the GR19 folder, execute:
 
 ## MatRiCT+ Integration
 
-The integration of **MAGNET** and **GR19-DGS** into the MatRiCT+ payment protocol can be found in the **matrict_plus-integration** folder. In order to compile the source code, you need the https://github.com/XKCP/XKCP[XKCP] i.e., Keccak library.
+The integration of **MAGNET** and **GR19-DGS** into the MatRiCT+ payment protocol can be found in the **matrict_plus-integration** folder. In order to compile the source code, you need [XKCP](https://github.com/XKCP/XKCP) i.e., extended Keccak library.
 
 To run the implementation, navigate to the **n10** folder and execute:
 
@@ -122,4 +122,4 @@ Program output can be monitored using the Serial Terminal provided by the nRF Co
 
 ## Test Vector Leakage Assessment
 
-The leakage assessment tests and the corresponding hardened implementations for each gadget and masked sampling algorithm are located in the **TVLA** directory.
+The leakage assessment tests and the corresponding hardened implementations for each gadget and masked sampling algorithm are located in the **TVLA** directory. The assessments are performed using a Chipwhisperer Lite STM32F303 capturer with an ARM Cortex-M4 target. Each gadget has the corresponding Jupyter Notebook driver script and hardened Cortex-M4 assembly implementations under the related ``target`` folder. To install Chipwhisperer on Linux, follow the [installation guide](https://chipwhisperer.readthedocs.io/en/latest/linux-install.html). Gadgets can be placed inside the ``chipwhisperer/jupyter`` directory and run directly from there.
