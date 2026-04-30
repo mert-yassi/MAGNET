@@ -83,7 +83,7 @@ void SecINC(uint32_t *z, const uint32_t *x, const uint32_t *one) {
     uint32_t g[NUM_SHARES] = {0}, a[NUM_SHARES] = {0}, a_prm[NUM_SHARES] = {0};
     for(int i = 0; i < NUM_SHARES; ++i) g[i] = x[i];
 
-    for(int j = 1; j <= W; ++j) {
+    for(int j = 1; j <= WW; ++j) {
     	uint32_t pw = 1 << (j - 1);
         const uint32_t high = 0xFFFFFFFF << pw;
         const uint32_t low  = ~high;
@@ -103,7 +103,7 @@ void SecADD(uint32_t* z, const uint32_t* x, const uint32_t* y) { // [BBE+18]
 	for(int i = 0; i < NUM_SHARES; ++i) p[i] = x[i] ^ y[i];
 	SecAND(g, x, y);
 	
-	for(int j = 1; j <= W - 1; ++j) {
+	for(int j = 1; j <= WW - 1; ++j) {
 		uint32_t pw = 1 << (j - 1);
 		for(int i = 0; i < NUM_SHARES; ++i) a[i] = g[i] << pw;
 		SecAND(a_, a, p);
@@ -116,7 +116,7 @@ void SecADD(uint32_t* z, const uint32_t* x, const uint32_t* y) { // [BBE+18]
 		
 		for(int i = 0; i < NUM_SHARES; ++i) p[i] = p_[i];
 	}
-	for(int i = 0; i < NUM_SHARES; ++i) a[i] = g[i] << (1 << (W - 1));
+	for(int i = 0; i < NUM_SHARES; ++i) a[i] = g[i] << (1 << (WW - 1));
 	SecAND(a_, a, p);
 	
 	for(int i = 0; i < NUM_SHARES; ++i) g[i] ^= a_[i];
