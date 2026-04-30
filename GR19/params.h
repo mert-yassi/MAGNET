@@ -17,7 +17,7 @@ extern int SIG;
 #define MASKING_ORDER 1
 #define N_SHARES MASKING_ORDER+1
 
-#define ITER 25
+#define ITER 100
 #define SCALE (((uint64_t)1ULL << 63) - 1ULL)
 
 #define PARAM_Q 4194304
