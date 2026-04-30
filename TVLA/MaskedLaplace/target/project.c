@@ -7,13 +7,14 @@
 #include <math.h>
 #include <string.h>
 
+#define NUM_SHARES 2
+
 #define N 100
-#define SIG 8
+#define SIG 16
 #define LMD 32
 #define PS 0.76
 #define w 32
 #define W 5 // ceil(log2(w-1))
-#define NUM_SHARES 2
 
 #define mu 2
 #define kap 2
@@ -24,22 +25,13 @@
 
 #define rand_uint32() xoshiro_next()
 
-//int kap, l, mu, m;
-double N0, t, r, p, p0, dlap_bias, k1, k2;
+double t, r, p, dlap_bias;
 
 void init_parameters(void) {
-	N0 = sqrt(2 * log(2) * (LMD + 2 + log2(N))) * SIG;
-	//kap = 2; //(int)ceil(log2(N0 - 1));
-	//l = 2 * kap;
 	t = (SIG * SIG) / round(SIG);
 	r = 2 * SIG * SIG;
 	p = exp(-1 / t);
-	p0 = PS - pow(2, -LMD);
-	//mu = 2; //(int)ceil(LMD + 2 + log2((2.0 * (kap + 1) + l) * N / p0));
 	dlap_bias = 0.05; //(1 - p) / (1 + p - 2 * exp(-(pow(2, kap) + 1) / t));
-	k1 = N / p0;
-	k2 = ((LMD + 2) * log(2)) / (2 * p0 * p0);
-	//m = (int)ceil(k1 + k2 / 2 + sqrt(k2 * k2 / 4 + k1 * k2));
 }
 
 static inline uint32_t rotl(const uint32_t x, int k) {
@@ -124,14 +116,6 @@ extern void MaskedLaplace_m4(uint32_t *v, uint32_t *p_lap, uint32_t *p_geo, uint
 uint8_t get_pt(uint8_t* pt, uint8_t len) {
     seed_xoshiro(pt);
     init_parameters();
-
-    //double N0 = sqrt(2 * log(2) * (LMD + 2 + log2(N))) * SIG;
-	//int kap = (int)ceil(log2(N0 - 1));
-    //int l = 2 * kap;
-    double t = (SIG * SIG) / round(SIG);
-    double p = exp(-1 / t);
-    double dlap_bias = 0.5; //(1 - p) / (1 + p - 2 * exp(-(pow(2, kap) + 1) / t));
-    //double p0 = PS - pow(2, -LMD);
 
     uint32_t *p_lap = (uint32_t*)malloc((mu * NUM_SHARES) * sizeof(uint32_t));
     bin_rep(p_lap, dlap_bias);

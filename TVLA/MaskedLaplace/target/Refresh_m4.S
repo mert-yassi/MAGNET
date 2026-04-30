@@ -13,7 +13,6 @@
 @ -----------------------------------------------------------------------------
 Refresh_m4:
     PUSH    {r4-r6, lr}
-    SUB     sp, sp, #8          @ Allocate Scrub Slot on Stack
 
     @ 1. Load the Mask 'r'
     LDR     r2, [r1], #4        @ r = pool[next]
@@ -21,17 +20,8 @@ Refresh_m4:
     @ =========================================================
     @ UPDATE SHARE 0
     @ =========================================================
-
     LDR     r3, [r0]            @ Load x[0]
-
-    STR     r2, [sp]
-
-    LDR     r5, [r1]            @ Random Load
-
     EOR     r3, r3, r2          @ x[0] ^= r
-    
-    STR     r2, [sp]
-
     STR     r3, [r0]            @ Store x[0]
     
     @ Clear register to prevent ALU leakage
@@ -53,5 +43,4 @@ Refresh_m4:
     LDR     r5, [r1]            @ Random Load
 
     @ Cleanup
-    ADD     sp, sp, #8
     POP     {r4-r6, pc}

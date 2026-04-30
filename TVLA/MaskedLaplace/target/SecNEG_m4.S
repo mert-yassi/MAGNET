@@ -14,52 +14,42 @@
 @   R2 = pool (Randomness pointer)
 @ -----------------------------------------------------------------------------
 SecNEG_m4:
-    PUSH    {r4-r6, lr}
+    PUSH    {r4-r7, lr}
     
-    @ Allocate Scrub Slot
-    SUB     sp, sp, #8
-
-    @ Preserve pointers
     MOV     r4, r0              @ r4 = z
     MOV     r5, r2              @ r5 = pool
 
-    @ =========================================================
-    @ PROCESS SHARE 0: z[0] = -(x[0] & 1)
-    @ =========================================================
     LDR     r3, [r1]            @ Load x[0]
+    
+    LDR     r6, [r5]            @ Load Random
+    
+    LDR     r7, [r1, #4]        @ FIX 2: Pre-load x[1] safely into r7 before overwrite
+    
     AND     r3, r3, #1          @ Mask LSB
     RSB     r3, r3, #0          @ Negate: 0 - r3 (0 -> 0, 1 -> -1)
     STR     r3, [r4]            @ Store z[0]
 
-    @ =========================================================
-    @ SCRUBBING (Break correlation between z[0] and z[1])
-    @ =========================================================
-    LDR     r6, [r5]            @ Load Random (Peek)
- 
-    @ Scrub Write Bus
-    STR     r6, [sp]            @ Dummy Store to Stack
-    DSB
+    LDR     r6, [r5]            @ Load Random
+    EOR     r3, r3, r6
+    NOP
+    
+    STR     r6, [r4, #4]
+    EOR     r3, r3, r3
 
-    @ =========================================================
-    @ PROCESS SHARE 1: z[1] = -(x[1] & 1)
-    @ =========================================================
-    LDR     r3, [r1, #4]        @ Load x[1]
+    MOV     r3, r7
     AND     r3, r3, #1          @ Mask LSB
-
     RSB     r3, r3, #0          @ Negate
-
     STR     r3, [r4, #4]        @ Store z[1]
 
-    @ =========================================================
-    @ CALL REFRESH
-    @ =========================================================
-    @ Refresh_m4(z, pool)
+
+    LDR     r12, [r5]           @ Load random from pool -> Bus holds Random (Scrub!)
+    EOR     r12, r12, r12       @ Clear pipeline register to 0
+    MOV     r3, #0
+
     MOV     r0, r4              @ R0 = z
     MOV     r1, r5              @ R1 = pool
- 
+    
     BL      Refresh_m4
 
-    @ Cleanup
-    ADD     sp, sp, #8
-    POP     {r4-r6, pc}
+    POP     {r4-r7, pc}
     
