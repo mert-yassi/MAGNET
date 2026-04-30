@@ -5,7 +5,7 @@
 #define LMD 64
 #define PS 0.76
 
-#define ITER 25
+#define ITER 100
 
 #define rand_uint32() xoshiro_next()
 
