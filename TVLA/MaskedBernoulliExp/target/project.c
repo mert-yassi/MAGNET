@@ -15,7 +15,6 @@
 #define PS 0.76
 #define mu 2
 #define l 2
-#define NUM_SHARES 2
 #define rand_uint32() xoshiro_next()
 
 #define BER_RAND mu

@@ -1,3 +1,7 @@
+@ Hardened order-1 Cortex-M4 SecAND implementation of [GG25]
+@ François Gérard and Morgane Guerreau. High-Order and Cortex-M4 First-Order Implementations of Masked FrodoKEM
+@ https://github.com/fragerar/masked_Frodo
+
 .section .text
 .syntax unified
 .cpu cortex-m4
@@ -7,11 +11,10 @@
 SecAND_m4:
     PUSH    {r4-r11, lr}
 
-    @ Register aliases
-    pz      .req r0      @ Output pointer
-    py      .req r1      @ Input Y pointer
-    px      .req r2      @ Input X pointer
-    pool    .req r3      @ Scratch memory / pool pointer
+    pz      .req r0
+    py      .req r1
+    px      .req r2
+    pool    .req r3
     t1      .req r4
     rx0     .req r5
     rx1     .req r12
@@ -25,14 +28,11 @@ SecAND_m4:
     LDR     rx0, [px], #4
     LDR     r,   [pool]
     LDR     rx1, [px], #4
-    NOP
 
     LDR     ry0, [py], #4
-    NOP
-    STR     t1,  [pool]	
-    NOP
+    EOR     t1,  t1, t1
+    STR     t1,  [sp, #-4]
     LDR     ry1, [py], #4
-    NOP
 
     AND     rz0, rx0, ry0
     EOR     t1,  t1, t1
@@ -44,30 +44,26 @@ SecAND_m4:
     EOR     px,  px, px
     AND     t2,  rx1, ry0
 
-    NOP
     EOR     px,  px, px
     EOR     t1,  r, t1
 
-    NOP                    
-    EOR     px,  px, px    
+    EOR     px,  px, px
     EOR     t1,  t2, t1
 
     EOR     px,  px, px
     EOR     rz0, rz0, r
 
-    NOP
     EOR     px,  px, px
     EOR     rz1, rz1, t1
 
     EOR     px,  px, px
-    NOP
     STR     rz0, [pz], #4
-    NOP
-    STR     px,  [pool]
-    NOP
+    STR     px,  [sp, #-4]
     STR     rz1, [pz], #4
           
-    @ ---- Clean up register aliases ----
+    NOP
+    NOP
+          
     .unreq  pz
     .unreq  py
     .unreq  px
