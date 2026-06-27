@@ -8,6 +8,7 @@
 .thumb
 
 .global SecAND_m4
+.thumb_func
 SecAND_m4:
     PUSH    {r4-r11, lr}
 
