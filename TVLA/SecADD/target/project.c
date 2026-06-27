@@ -8,37 +8,6 @@
 #include <string.h>
 
 #define NUM_SHARES 2
-#define rand_uint32() xoshiro_next()
-
-static inline uint32_t rotl(const uint32_t x, int k) {
-	return (x << k) | (x >> (32 - k));
-}
-
-static uint32_t s[4];
-
-void seed_xoshiro(uint32_t* up){
-    s[0] = up[0];
-    s[1] = up[1];
-    s[2] = up[0];
-    s[3] = up[1];
-}
-
-uint32_t xoshiro_next(void) {
-	const uint32_t result_starstar = rotl(s[0] * 5, 7) * 9;
-
-	const uint32_t t = s[1] << 9;
-
-	s[2] ^= s[0];
-	s[3] ^= s[1];
-	s[1] ^= s[2];
-	s[0] ^= s[3];
-
-	s[2] ^= t;
-
-	s[3] = rotl(s[3], 11);
-
-	return result_starstar;
-}
 
 extern void SecADD_m4(uint32_t *zp, const uint32_t *xp, const uint32_t *yp, const uint32_t *up);
 
@@ -55,15 +24,6 @@ uint8_t get_pt(uint8_t* pt, uint8_t len) {
     up[0] = ((uint32_t)pt[19] << 24) | ((uint32_t)pt[18] << 16) | ((uint32_t)pt[17] << 8) | pt[16];
     up[1] = ((uint32_t)pt[23] << 24) | ((uint32_t)pt[22] << 16) | ((uint32_t)pt[21] << 8) | pt[20];
     up[2] = ((uint32_t)pt[27] << 24) | ((uint32_t)pt[26] << 16) | ((uint32_t)pt[25] << 8) | pt[24];    
-    
-    /*
-    seed_xoshiro(up);
-
-    uint32_t pool[7*NUM_SHARES];
-    for(int i = 0; i < 7*NUM_SHARES; ++i) {
-        pool[i] = rand_uint32();
-    }
-    */
     
     for (volatile int k = 0; k < 1000; k++) {;} // to clean the power trace
 

@@ -8,12 +8,13 @@
 @ -----------------------------------------------------------------------------
 @ External Functions
 @ -----------------------------------------------------------------------------
-.extern SecAB_m4
-.extern SecBA_m4
+.extern SecA2B_m4
+.extern SecB2A_m4
 
 @ -----------------------------------------------------------------------------
 @ void SecADD_m4(uint32_t *z, const uint32_t *x, const uint32_t *y, const uint32_t *pool)
 @ -----------------------------------------------------------------------------
+.thumb_func
 SecADD_m4:
     @ 1. Prologue
     @ Push 6 registers (24 bytes) to maintain 8-byte stack alignment
@@ -36,9 +37,9 @@ SecADD_m4:
     MOV     r0, sp          @ Arg0: dst (storage for xa)
     MOV     r1, r5          @ Arg1: src (x_ptr)
     MOV     r2, r7          @ Arg2: pool
-    BL      SecBA_m4
+    BL      SecB2A_m4
 
-    @ Advance pool pointer (assuming SecBA used 1 random word)
+    @ Advance pool pointer (assuming SecB2A used 1 random word)
     ADD     r7, r7, #4
 
     @ [SCRUB 1] Bus likely holds a share of X. Scrub before touching Y.
@@ -50,7 +51,7 @@ SecADD_m4:
     ADD     r0, sp, #8      @ Arg0: dst (storage for ya at sp+8)
     MOV     r1, r6          @ Arg1: src (y_ptr)
     MOV     r2, r7          @ Arg2: pool
-    BL      SecBA_m4
+    BL      SecB2A_m4
 
     @ Advance pool pointer
     ADD     r7, r7, #4
@@ -71,18 +72,16 @@ SecADD_m4:
     NOP
     EOR     r12, r12, r12
 
-    ADD     r0, r0, r1      @ Add
+    ADD     r0, r0, r1
 
     NOP
     EOR     r12, r12, r12
 
     STR     r0, [sp, #0]    @ Store result back to stack (za[0])
 
-    @ [SCRUB 3] CRITICAL!
-    @ Bus now holds za[0]. If we immediately load xa[1], 
-    @ we leak HW(za[0] ^ xa[1]).
+    @ [SCRUB 3]
+    @ Bus now holds za[0]. If we immediately load xa[1], we leak HW(za[0] ^ xa[1]).
     LDR     r12, [r7, #-4]  @ Dummy load random value
-    
     
     @ --- za[1] = xa[1] + ya[1] ---
     LDR     r0, [sp, #4]    @ Load xa[1]
@@ -93,7 +92,7 @@ SecADD_m4:
     NOP
     EOR     r12, r12, r12
 
-    ADD     r0, r0, r1      @ Add
+    ADD     r0, r0, r1
 
     NOP
     EOR     r12, r12, r12
@@ -111,7 +110,7 @@ SecADD_m4:
     MOV     r0, r4          @ Arg0: dst (z_ptr)
     MOV     r1, sp          @ Arg1: src (points to za at sp)
     MOV     r2, r7          @ Arg2: pool
-    BL      SecAB_m4
+    BL      SecA2B_m4
 
     @ ---------------------------------------------------------
     @ Epilogue
