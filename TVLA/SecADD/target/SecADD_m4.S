@@ -39,7 +39,7 @@ SecADD_m4:
     MOV     r2, r7          @ Arg2: pool
     BL      SecB2A_m4
 
-    @ Advance pool pointer (assuming SecB2A used 1 random word)
+    @ Advance pool pointer (SecB2A used 1 random word)
     ADD     r7, r7, #4
 
     @ [SCRUB 1] Bus likely holds a share of X. Scrub before touching Y.
@@ -53,7 +53,7 @@ SecADD_m4:
     MOV     r2, r7          @ Arg2: pool
     BL      SecB2A_m4
 
-    @ Advance pool pointer
+    @ Advance pool pointer (SecB2A used 1 random word)
     ADD     r7, r7, #4
 
     @ [SCRUB 2] Bus likely holds a share of Y. Scrub before Math.
@@ -115,7 +115,6 @@ SecADD_m4:
     @ ---------------------------------------------------------
     @ Epilogue
     @ ---------------------------------------------------------
-    @ Optional: Zero out stack to clear secrets
     MOV     r0, #0
     STR     r0, [sp, #0]
     STR     r0, [sp, #4]
