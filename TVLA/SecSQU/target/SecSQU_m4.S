@@ -4,7 +4,7 @@
 .thumb
 
 .global SecSQU_m4
-
+.thumb_func
 SecSQU_m4:
     PUSH    {r4-r11, lr}
 
