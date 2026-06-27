@@ -6,6 +6,7 @@
 .global MaskedBernoulli_m4
 
 @ Params: R0=x, R1=p, R2=one, R3=rs, [SP]=pool
+.thumb_func
 MaskedBernoulli_m4:
     PUSH    {r4-r11, lr}
     LDR     r7, [sp, #36]       @ R7 = pool ptr
