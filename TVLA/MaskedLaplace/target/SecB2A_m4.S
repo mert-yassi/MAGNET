@@ -8,6 +8,7 @@
 .thumb
 
 .global SecB2A_m4
+.thumb_func
 SecB2A_m4:
 
     PUSH {r4-r11,r14}
