@@ -2,7 +2,7 @@
 
 This is the implementation source code for the paper:
 
-Muhammed F. Esgin, Ron Steinfeld, & Raymond K. Zhao. (2022). MatRiCT+: More Efficient Post-Quantum Private Blockchain Payments. IEEE S&P 2022. DOI https://doi.org/10.1109/SP46214.2022.9833655[10.1109/SP46214.2022.9833655]. https://ia.cr/2021/545[Preprint].
+Muhammed F. Esgin, Ron Steinfeld, & Raymond K. Zhao. (2022). [MatRiCT+: More Efficient Post-Quantum Private Blockchain Payments](https://ia.cr/2021/545). IEEE S&P 2022. DOI https://doi.org/10.1109/SP46214.2022.9833655.
 
 The folder `n10`  is the implementation for anonymity level 1/10.
 
