@@ -76,7 +76,7 @@ To compile and run MatRiCT+ with the **GR19** sampler:
 make gr19 && ./ringct
 ```
 
-By default, **MAGNET** is used as the discrete Gaussian sampler, so the following command also builds and runs the MAGNET integration:
+By default, **MAGNET** is used as the discrete Gaussian sampler, so the following command also builds and runs the **MAGNET** integration:
 
 ```bash
 make && ./ringct
