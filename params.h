@@ -1,8 +1,13 @@
 #ifndef PARAMS_H_
 #define PARAMS_H_
 
+#if !defined(TIME) && !defined(VERIFY)
 #define TIME
-//#define VERIFY
+#endif
+
+#if defined(TIME) && defined(VERIFY)
+#error "Define only one of TIME or VERIFY"
+#endif
 
 #define ITER 100
 
@@ -14,8 +19,12 @@
 #define LMD 64 // Security parameter lambda
 #define PS 0.76 // Acceptance probability
 
-#define NUM_SHARES 2 // Number of shares
-#define MASK_ORDER NUM_SHARES - 1 // Masking order
+#ifndef MASK_ORDER
+#define MASK_ORDER 1
+#endif
+
+#define NUM_SHARES (MASK_ORDER + 1)
+
 #define w 32 // Word size
 #define W 5 // ceil(log2(w-1))
 
