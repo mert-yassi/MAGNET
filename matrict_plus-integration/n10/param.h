@@ -3,8 +3,11 @@
 
 #include "poly_param.h"
 
+#ifndef MAGNET_
+#ifndef GR19
 #define MAGNET_
-//#define GR19
+#endif
+#endif
 
 #define CRYPTO_BYTES 32LL
 
