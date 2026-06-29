@@ -14,6 +14,8 @@
 @ -----------------------------------------------------------------------------
 @ void SecADD_m4(uint32_t *z, const uint32_t *x, const uint32_t *y, const uint32_t *pool)
 @ -----------------------------------------------------------------------------
+
+.type SecADD_m4, %function
 .thumb_func
 SecADD_m4:
     @ 1. Prologue

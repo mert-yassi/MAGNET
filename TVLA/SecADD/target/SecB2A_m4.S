@@ -4,6 +4,8 @@
 .thumb
 
 .global SecB2A_m4
+
+.type SecB2A_m4, %function
 .thumb_func
 SecB2A_m4:
 
