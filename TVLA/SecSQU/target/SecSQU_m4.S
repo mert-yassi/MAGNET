@@ -4,6 +4,8 @@
 .thumb
 
 .global SecSQU_m4
+
+.type SecSQU_m4, %function
 .thumb_func
 SecSQU_m4:
     PUSH    {r4-r11, lr}
@@ -69,3 +71,4 @@ SecSQU_m4:
     STR     r6, [r0, #4]        @ Store C[1]
     
     POP     {r4-r11, pc}
+    
