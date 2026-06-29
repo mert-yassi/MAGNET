@@ -8,6 +8,7 @@
 .extern MaskedGeometric_m4
 .extern SecNEG_m4
 .extern SecINC_m4
+.extern SecAND_m4
 
 .equ INC_RC_BERN, 16
 .equ INC_PC_BERN, 32
@@ -15,22 +16,42 @@
 .equ INC_PC_NEG, 20
 .equ INC_PC_INC, 20
 
-.equ STACK_ALLOC, 12
+@ Stack layout, relative to SP after allocation:
+@   [sp, #0]   child stack argument: pool
+@   [sp, #4]   b[0]
+@   [sp, #8]   b[1]
+@   [sp, #12]  mask[0] = -(!b)[0]
+@   [sp, #16]  mask[1] = -(!b)[1]
+@   [sp, #20]  gp1[0] = (g + 1)[0]
+@   [sp, #24]  gp1[1] = (g + 1)[1]
+@   [sp, #28]  padding / scratch
+.equ STACK_ALLOC, 32
+.equ B_OFF,      4
+.equ MASK_OFF,   12
+.equ GP1_OFF,    20
 
+.type MaskedLaplace_m4, %function
 .thumb_func
 MaskedLaplace_m4:
     PUSH    {r4-r11, lr}
     SUB     sp, sp, #STACK_ALLOC
 
-    LDR     r8, [sp, #48]
-    LDR     r7, [sp, #52]
+    @ Original stack arguments are shifted by PUSH + STACK_ALLOC.
+    @ [caller_sp]     = rs
+    @ [caller_sp + 4] = pool
+    LDR     r8, [sp, #(36 + STACK_ALLOC)]      @ r8 = rs
+    LDR     r7, [sp, #(36 + STACK_ALLOC + 4)]  @ r7 = pool
 
-    MOV     r4, r0
-    MOV     r5, r1
-    MOV     r6, r2
-    MOV     r10, r3
+    MOV     r4, r0          @ output z / temporary geometric accumulator
+    MOV     r5, r1          @ p_bern
+    MOV     r6, r2          @ p_geo
+    MOV     r10, r3         @ one
 
-    MOV     r0, r4
+    @ -------------------------------------------------------------------------
+    @ Step 1: b <- MaskedBernoulli(...)
+    @ Store b in a dedicated stack buffer, not in the final output buffer.
+    @ -------------------------------------------------------------------------
+    ADD     r0, sp, #B_OFF
     MOV     r1, r5
     MOV     r2, r10
     MOV     r3, r8
@@ -40,14 +61,25 @@ MaskedLaplace_m4:
     ADD     r8, r8, #INC_RC_BERN
     ADD     r7, r7, #INC_PC_BERN
 
-    LDR     r9, [r4]
+    @ -------------------------------------------------------------------------
+    @ Step 2: mask <- -(!b)
+    @ Boolean NOT: invert only share 0, then SecNEG expands the LSB to a word mask.
+    @ -------------------------------------------------------------------------
+    LDR     r0, [sp, #B_OFF]
+    MVN     r0, r0
+    STR     r0, [sp, #B_OFF]
 
-    LDR     r12, [r7, #4]
+    ADD     r0, sp, #MASK_OFF      @ z = mask
+    ADD     r1, sp, #B_OFF         @ x = !b
+    MOV     r2, r7                 @ pool
+    BL      SecNEG_m4
 
-    LDR     r11, [r4, #4]
+    ADD     r7, r7, #INC_PC_NEG
 
-    LDR     r12, [r7]
-
+    @ -------------------------------------------------------------------------
+    @ Step 3: g <- MaskedGeometric(...)
+    @ MaskedGeometric accumulates into its output, so initialize it to zero.
+    @ -------------------------------------------------------------------------
     MOV     r0, #0
     STR     r0, [r4]
     STR     r0, [r4, #4]
@@ -61,115 +93,25 @@ MaskedLaplace_m4:
 
     ADD     r7, r7, #INC_PC_GEO
 
-    LDR     r12, [r7]
-
-    LDR     r5, [r4]
-
-    NOP
-    
-    LDR     r6, [r4, #4]
-
-    MVN     r9, r9
-    NOP
-    EOR     r12, r12, r12
-
-    STR     r9, [sp, #4]
-
-    NOP
-    LDR     r12, [r7]
-
-    STR     r11, [sp, #8]
-    NOP
-    
-    ADD     r0, sp, #4
-    ADD     r1, sp, #4
-    MOV     r2, r7
-    BL      SecNEG_m4
-
-    ADD     r7, r7, #INC_PC_NEG
-
-    LDR     r12, [r7]
-
-    STR     r5, [r4]
- 
-    STR     r6, [r4, #4]
-
-    NOP
-    LDR     r12, [r7]
-
-    MOV     r0, r4
-    MOV     r1, r4
-    MOV     r2, r10
-    MOV     r3, r7
-    
+    @ -------------------------------------------------------------------------
+    @ Step 4: gp1 <- g + 1
+    @ -------------------------------------------------------------------------
+    ADD     r0, sp, #GP1_OFF       @ z = gp1
+    MOV     r1, r4                 @ x = g
+    MOV     r2, r10                @ one
+    MOV     r3, r7                 @ pool
     BL      SecINC_m4
 
     ADD     r7, r7, #INC_PC_INC
 
-    LDR     r12, [r7]
-    
-    LDR     r5, [r4]
-    LDR     r12, [r7, #-4]
-    LDR     r6, [r4, #4]
-    
-    LDR     r12, [r7, #-8]
-    LDR     r9, [sp, #4]
-    
-    LDR     r12, [r7, #-12]
-    LDR     r10, [sp, #8]
-    
-    LDR     r8, [r7]
+    @ -------------------------------------------------------------------------
+    @ Step 5: z <- gp1 & mask using the tested SecAND gadget.
+    @ -------------------------------------------------------------------------
+    MOV     r0, r4                 @ z = output
+    ADD     r1, sp, #MASK_OFF      @ y = mask
+    ADD     r2, sp, #GP1_OFF       @ x = gp1
+    MOV     r3, r7                 @ pool
+    BL      SecAND_m4
 
-    AND     r0, r5, r9
-    EOR     r12, r12, r12
-
-    AND     r1, r6, r10
-    EOR     r12, r12, r12
-
-    AND     r2, r5, r10
-    EOR     r12, r12, r12
-
-    AND     r3, r6, r9
-    EOR     r12, r12, r12
-
-    EOR     r2, r8, r2
-    EOR     r12, r12, r12
-
-    EOR     r2, r3, r2
-    EOR     r12, r12, r12
-
-    EOR     r0, r0, r8
-    EOR     r12, r12, r12
-
-    EOR     r1, r1, r2
-    EOR     r12, r12, r12
-
-    LDR     r3, [r7, #-16]
-    EOR     r0, r0, r3
-    EOR     r12, r12, r12
-    EOR     r1, r1, r3
-    EOR     r12, r12, r12
-
-    STR     r0, [r4]
-    LDR     r12, [r7, #-20]
-    STR     r1, [r4, #4]
-    
-    LDR     r12, [r7, #-24]
-    LDR     r8,  [r7, #-28]
-    
-    STR     r12, [sp, #4]       
-    STR     r8,  [sp, #8]       
-    
-    MOV     r0, r12             
-    MOV     r2, r12             
-    MOV     r5, r12             
-    MOV     r9, r12             
-    
-    MOV     r1, r8              
-    MOV     r3, r8              
-    MOV     r6, r8              
-    MOV     r10, r8             
-    MOV     r11, r8
-    
     ADD     sp, sp, #STACK_ALLOC
     POP     {r4-r11, pc}

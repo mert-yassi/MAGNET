@@ -13,6 +13,8 @@
 @   R1 = x    (Input pointer)
 @   R2 = pool (Randomness pointer)
 @ -----------------------------------------------------------------------------
+
+.type SecNEG_m4, %function
 .thumb_func
 SecNEG_m4:
     PUSH    {r4-r7, lr}
