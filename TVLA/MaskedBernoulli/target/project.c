@@ -29,7 +29,7 @@ void init_parameters(void) {
 	r = 2 * SIG * SIG;
 	p = exp(-1 / t);
 	p0 = PS - pow(2, -LMD);
-	mu = 3; //(int)ceil(LMD + 2 + log2((2.0 * (kap + 1) + l) * N / p0));
+	mu = 2; //(int)ceil(LMD + 2 + log2((2.0 * (kap + 1) + l) * N / p0));
 	dlap_bias = 0.5; //(1 - p) / (1 + p - 2 * exp(-(pow(2, kap) + 1) / t));
 	k1 = N / p0;
 	k2 = ((LMD + 2) * log(2)) / (2 * p0 * p0);
@@ -40,44 +40,59 @@ static inline uint32_t rotl(const uint32_t x, int k) {
 	return (x << k) | (x >> (32 - k));
 }
 
-static uint32_t s[4];
+static uint32_t sample_s[4];
+static uint32_t mask_s[4];
 
-void seed_xoshiro(uint8_t* pt){
-    s[0] = ((uint32_t)pt[3] << 24) | ((uint32_t)pt[2] << 16) | ((uint32_t)pt[1] <<  8) | ((uint32_t)pt[0] );
-    s[1] = ((uint32_t)pt[7] << 24) | ((uint32_t)pt[6] << 16) | ((uint32_t)pt[5] <<  8) | ((uint32_t)pt[4] );
-    s[2] = ((uint32_t)pt[11] << 24) | ((uint32_t)pt[10] << 16) | ((uint32_t)pt[9] <<  8) | ((uint32_t)pt[8] );
-    s[3] = ((uint32_t)pt[15] << 24) | ((uint32_t)pt[14] << 16) | ((uint32_t)pt[13] <<  8) | ((uint32_t)pt[12] );
+static void seed_xoshiro_state(uint32_t st[4], const uint8_t *pt) {
+    st[0] = ((uint32_t)pt[3]  << 24) | ((uint32_t)pt[2]  << 16) | ((uint32_t)pt[1]  << 8) | pt[0];
+    st[1] = ((uint32_t)pt[7]  << 24) | ((uint32_t)pt[6]  << 16) | ((uint32_t)pt[5]  << 8) | pt[4];
+    st[2] = ((uint32_t)pt[11] << 24) | ((uint32_t)pt[10] << 16) | ((uint32_t)pt[9]  << 8) | pt[8];
+    st[3] = ((uint32_t)pt[15] << 24) | ((uint32_t)pt[14] << 16) | ((uint32_t)pt[13] << 8) | pt[12];
 }
 
-uint32_t xoshiro_next(void) {
-	const uint32_t result_starstar = rotl(s[0] * 5, 7) * 9;
+static uint32_t xoshiro_next_state(uint32_t st[4]) {
+    const uint32_t result_starstar = rotl(st[0] * 5, 7) * 9;
+    const uint32_t t = st[1] << 9;
 
-	const uint32_t t = s[1] << 9;
+    st[2] ^= st[0];
+    st[3] ^= st[1];
+    st[1] ^= st[2];
+    st[0] ^= st[3];
 
-	s[2] ^= s[0];
-	s[3] ^= s[1];
-	s[1] ^= s[2];
-	s[0] ^= s[3];
+    st[2] ^= t;
+    st[3] = rotl(st[3], 11);
 
-	s[2] ^= t;
-
-	s[3] = rotl(s[3], 11);
-
-	return result_starstar;
+    return result_starstar;
 }
 
-void GenUniRandBit(uint32_t* x) {
-	for(int i = 0; i < NUM_SHARES; ++i) x[i] = rand_uint32() & 1;
+static inline uint32_t sample_rand_uint32(void) {
+    return xoshiro_next_state(sample_s);
 }
+
+static inline uint32_t mask_rand_uint32(void) {
+    return xoshiro_next_state(mask_s);
+}
+
 
 void Refresh(uint32_t* x) { // [ISW03]
 	for(int i = 0; i < NUM_SHARES; ++i) {
 		for(int j = i + 1; j < NUM_SHARES; ++j) {
-			uint32_t r = rand_uint32();
+			uint32_t r = mask_rand_uint32();
 			x[i] ^= r;
 			x[j] ^= r;
 		}
 	}
+}
+
+void GenMaskedSampleBit(uint32_t* x) {
+    uint32_t bit = sample_rand_uint32() & 1;
+
+    x[0] = bit;
+    for(int i = 1; i < NUM_SHARES; ++i) {
+        x[i] = 0;
+    }
+
+    Refresh(x);
 }
 
 void bin_rep(uint32_t *b_msk, double p) {
@@ -98,7 +113,9 @@ void bin_rep(uint32_t *b_msk, double p) {
 extern void MaskedBernoulli_m4(uint32_t *zp, uint32_t *p_lap, uint32_t *one, uint32_t *rs, uint32_t *pool);
 
 uint8_t get_pt(uint8_t* pt, uint8_t len) {
-    seed_xoshiro(pt);
+    seed_xoshiro_state(sample_s, pt);       
+    seed_xoshiro_state(mask_s, pt + 16);
+
     init_parameters();
     
     uint32_t *p_lap = (uint32_t*)malloc((mu * NUM_SHARES) * sizeof(uint32_t));    
@@ -112,14 +129,13 @@ uint8_t get_pt(uint8_t* pt, uint8_t len) {
 	uint32_t r[NUM_SHARES] = {0}, zp[NUM_SHARES] = {0}; int j = 0;
     uint32_t pool[BER_RAND], rs[NUM_SHARES * mu];
 	for(int i = 0; i < mu; ++i) {
-	    GenUniRandBit(r);
-	    Refresh(r);
-        rs[j] = r[0]; j++;
-        rs[j] = r[1]; j++;
+	    GenMaskedSampleBit(r);
+        rs[j++] = r[0];
+        rs[j++] = r[1];
 	}
 
 	for(int i = 0; i < BER_RAND; ++i) {	
-	    pool[i] = rand_uint32();
+	    pool[i] = mask_rand_uint32();
 	}
         
     for (volatile int k = 0; k < 1000; k++) {;} // to clean the power trace
@@ -149,7 +165,7 @@ int main(void) {
 
     simpleserial_init();
 
-    simpleserial_addcmd('p', 16,  get_pt);
+    simpleserial_addcmd('p', 32,  get_pt);
         
     while(1)
         simpleserial_get();
