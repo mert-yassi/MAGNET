@@ -9,6 +9,8 @@
 .extern kap
 .extern mu
 
+.type MaskedGeometric_m4, %function
+.thumb_func
 MaskedGeometric_m4:
     PUSH    {r4-r11, lr}
     MOV     r4, r0

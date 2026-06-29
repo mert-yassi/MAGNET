@@ -7,6 +7,8 @@
 .extern SecB2A_m4
 .extern SecA2B_m4
 
+.type SecADD_m4, %function
+.thumb_func
 SecADD_m4:
     PUSH {r4-r8, lr}
     SUB sp, sp, #16

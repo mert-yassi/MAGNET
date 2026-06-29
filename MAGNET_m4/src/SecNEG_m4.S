@@ -6,6 +6,8 @@
 .global SecNEG_m4
 .extern Refresh_m4
 
+.type SecNEG_m4, %function
+.thumb_func
 SecNEG_m4:
     PUSH {r4-r5, lr}
 

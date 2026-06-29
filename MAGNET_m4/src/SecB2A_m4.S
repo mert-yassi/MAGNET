@@ -7,6 +7,8 @@
 .extern xoshiro_next
 .extern s
 
+.type SecB2A_m4, %function
+.thumb_func
 SecB2A_m4:
     PUSH {r4-r6, lr}
 

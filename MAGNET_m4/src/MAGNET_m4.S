@@ -12,8 +12,8 @@
 .extern MaskedLaplace_m4
 .extern MaskedBernoulliExp_m4
 .extern SecADD_m4
-.extern SecBA_m4
-.extern SecAB_m4
+.extern SecB2A_m4
+.extern SecA2B_m4
 .extern SecSQU_m4
 .extern SecNEG_m4
 .extern SecINC_m4
@@ -36,6 +36,8 @@
 .equ TMP_VAL,   104
 .equ STACK_SZ,  128
 
+.type MAGNET_m4, %function
+.thumb_func
 MAGNET_m4:
     PUSH    {r4-r11, lr}
     
@@ -73,7 +75,7 @@ loop_magnet:
 
     ADD     r0, sp, #V_BIG
     ADD     r1, sp, #V_SML
-    BL      SecBA_m4
+    BL      SecB2A_m4
 
     ADD     r0, sp, #U_BIG
     ADD     r1, sp, #V_BIG
@@ -81,7 +83,7 @@ loop_magnet:
 
     ADD     r0, sp, #U_SML
     ADD     r1, sp, #U_BIG
-    BL      SecAB_m4
+    BL      SecA2B_m4
 
     ADD     r0, sp, #B_BIT
     ADD     r1, sp, #U_SML

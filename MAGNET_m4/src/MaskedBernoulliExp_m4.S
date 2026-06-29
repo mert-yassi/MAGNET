@@ -11,6 +11,8 @@
 .extern l
 .extern mu
 
+.type MaskedBernoulliExp_m4, %function
+.thumb_func
 MaskedBernoulliExp_m4:
     PUSH    {r4-r11, lr}
     MOV     r4, r0

@@ -3,8 +3,9 @@
 .thumb
 
 .global xoshiro_next
-.type xoshiro_next, %function
 
+.type xoshiro_next, %function
+.thumb_func
 xoshiro_next:
     PUSH    {r4-r7, lr}
 

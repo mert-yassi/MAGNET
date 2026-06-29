@@ -12,6 +12,8 @@
 
 .equ STACK_ALLOC, 16
 
+.type MaskedLaplace_m4, %function
+.thumb_func
 MaskedLaplace_m4:
     PUSH    {r4-r11, lr}
     SUB     sp, sp, #STACK_ALLOC

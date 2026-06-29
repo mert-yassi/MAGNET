@@ -7,6 +7,8 @@
 .extern xoshiro_next
 .extern s
 
+.type Refresh_m4, %function
+.thumb_func
 Refresh_m4:
     PUSH {r4, lr}
 
