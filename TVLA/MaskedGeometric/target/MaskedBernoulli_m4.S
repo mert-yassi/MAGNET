@@ -3,9 +3,11 @@
 .cpu cortex-m4
 .thumb
 
+@ Params: R=x, R1=p, R2=one, R3=rs, [SP]=pool
+
 .global MaskedBernoulli_m4
 
-@ Params: R0=x, R1=p, R2=one, R3=rs, [SP]=pool
+.type MaskedBernoulli_m4, %function
 .thumb_func
 MaskedBernoulli_m4:
     PUSH    {r4-r11, lr}

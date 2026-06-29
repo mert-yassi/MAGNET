@@ -23,6 +23,8 @@
 @   R3 = rs       (uint32_t*) Randomness for p
 @   [SP] = pool   (uint32_t*) Fresh randomness stream
 @ -----------------------------------------------------------------------------
+
+.type MaskedGeometric_m4, %function
 .thumb_func
 MaskedGeometric_m4:
     PUSH    {r4-r11, lr}
