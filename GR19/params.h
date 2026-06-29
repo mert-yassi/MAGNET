@@ -14,8 +14,19 @@
 
 extern int SIG;
 
+#if !defined(TIME) && !defined(VERIFY)
+#define TIME
+#endif
+
+#if defined(TIME) && defined(VERIFY)
+#error "Define only one of TIME or VERIFY"
+#endif
+
+#ifndef MASKING_ORDER
 #define MASKING_ORDER 1
-#define N_SHARES MASKING_ORDER+1
+#endif
+
+#define N_SHARES (MASKING_ORDER + 1)
 
 #define ITER 100
 #define SCALE (((uint64_t)1ULL << 63) - 1ULL)
