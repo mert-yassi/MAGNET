@@ -13,6 +13,8 @@
 @ -----------------------------------------------------------------------------
 @ void SecINC_m4(uint32_t *z, const uint32_t *x, const uint32_t *one, const uint32_t *pool)
 @ -----------------------------------------------------------------------------
+
+.type SecINC_m4, %function
 .thumb_func
 SecINC_m4:
     PUSH    {r4-r6, lr}
