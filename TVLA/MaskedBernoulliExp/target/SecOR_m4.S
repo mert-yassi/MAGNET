@@ -5,6 +5,8 @@
 
 .global SecOR_m4
 .extern SecAND_m4
+
+.type SecOR_m4, %function
 .thumb_func
 SecOR_m4:
     PUSH    {r4-r7, lr}

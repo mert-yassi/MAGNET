@@ -17,6 +17,7 @@
 .equ RS_STEP, 16
 .equ POOL_BERN_STEP, 8
 
+.type MaskedBernoulliExp_m4, %function
 .thumb_func
 MaskedBernoulliExp_m4:
     PUSH    {r4-r11, lr}

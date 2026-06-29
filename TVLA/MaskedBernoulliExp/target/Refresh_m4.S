@@ -11,6 +11,8 @@
 @   r0 = x    (Pointer to 2 shares)
 @   r1 = pool (Pointer to Randomness Stream)
 @ -----------------------------------------------------------------------------
+
+.type Refresh_m4, %function
 .thumb_func
 Refresh_m4:
     PUSH    {r4-r6, lr}
